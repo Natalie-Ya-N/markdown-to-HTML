@@ -11,17 +11,55 @@ const escapeHtml = (unsafe: string): string => {
 
 export const generateStandaloneHtml = (doc: ParsedDoc): string => {
   const sectionsHtml = doc.sections.map((section, index) => {
+    // Determine previous and next sections for navigation
+    const prevSection = index > 0 ? doc.sections[index - 1] : null;
+    const nextSection = index < doc.sections.length - 1 ? doc.sections[index + 1] : null;
+
     // We need to render markdown to HTML here for the static export.
     return `
       <div id="section-${section.id}" class="section-content ${index === 0 ? '' : 'hidden'}">
         <header class="mb-8 pb-4">
-           <h1 class="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-tight leading-tight mb-4">${escapeHtml(section.title)}</h1>
+           <h1 class="text-3xl md:text-5xl font-extrabold text-slate-100 tracking-tight leading-tight mb-6">${escapeHtml(section.title)}</h1>
            <!-- Option A: Aurora Gradient (Full Width, Thinner 1.5px) -->
            <div class="h-[1.5px] w-full rounded-full bg-gradient-to-r from-[#5ABDAC] to-transparent"></div>
         </header>
+        
         <div class="prose prose-invert max-w-none prose-headings:font-bold prose-a:text-[#5ABDAC] hover:prose-a:text-[#7CD4C6] prose-h2:border-none prose-h2:pb-2">
           <div class="markdown-raw hidden">${escapeHtml(section.content)}</div>
           <div class="markdown-rendered"></div>
+        </div>
+
+        <!-- Navigation Footer -->
+        <div class="mt-24 grid grid-cols-1 md:grid-cols-2 gap-6 pt-10 border-t border-slate-800/60">
+            <!-- Previous Button -->
+            <div class="flex justify-start">
+                ${prevSection ? `
+                <button onclick="switchSection('${prevSection.id}')" class="group w-full md:w-auto min-w-[200px] flex flex-col items-start p-5 rounded-2xl border border-slate-800 bg-slate-900/30 hover:bg-slate-800/80 hover:border-[#5ABDAC]/30 transition-all duration-300 text-left">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 group-hover:text-[#5ABDAC] transition-colors">Previous</span>
+                    <div class="flex items-center gap-3 text-slate-300 group-hover:text-white transition-colors w-full">
+                        <svg class="w-5 h-5 flex-shrink-0 text-slate-500 group-hover:text-[#5ABDAC] transition-colors transform group-hover:-translate-x-1 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        <span class="text-lg font-semibold truncate max-w-[200px] md:max-w-[300px]">${escapeHtml(prevSection.title)}</span>
+                    </div>
+                </button>
+                ` : ''}
+            </div>
+            
+            <!-- Next Button -->
+            <div class="flex justify-end">
+                 ${nextSection ? `
+                <button onclick="switchSection('${nextSection.id}')" class="group w-full md:w-auto min-w-[200px] flex flex-col items-end p-5 rounded-2xl border border-slate-800 bg-slate-900/30 hover:bg-slate-800/80 hover:border-[#5ABDAC]/30 transition-all duration-300 text-right">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 group-hover:text-[#5ABDAC] transition-colors">Next</span>
+                    <div class="flex items-center gap-3 text-slate-300 group-hover:text-white transition-colors w-full justify-end">
+                        <span class="text-lg font-semibold truncate max-w-[200px] md:max-w-[300px]">${escapeHtml(nextSection.title)}</span>
+                        <svg class="w-5 h-5 flex-shrink-0 text-slate-500 group-hover:text-[#5ABDAC] transition-colors transform group-hover:translate-x-1 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </button>
+                ` : ''}
+            </div>
         </div>
       </div>
     `;
@@ -79,7 +117,7 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
       /* Layout split */
       .layout-container { display: flex; height: 100vh; overflow: hidden; width: 100%; }
       .sidebar { width: 350px; background-color: #0f172a; display: flex; flex-direction: column; flex-shrink: 0; }
-      .main-content { flex: 1; overflow-y: auto; background-color: #020617; padding: 3rem; min-width: 0; }
+      .main-content { flex: 1; overflow-y: auto; background-color: #020617; padding: 3rem; min-width: 0; scroll-behavior: smooth; }
       
       /* Specific Styling Overrides for Export */
       
