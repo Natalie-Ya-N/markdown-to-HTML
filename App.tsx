@@ -181,7 +181,7 @@ const App: React.FC = () => {
           <div className="w-full h-full px-8 py-12 md:px-12 md:py-16 mx-auto">
             {/* Page Header */}
             <header className="mb-12 pb-8 max-w-full">
-              <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight mb-6 break-words">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight mb-6 break-words">
                 {activeSection.title}
               </h1>
               {/* Option A: Aurora Gradient (Full Width, Thinner 1.5px) */}

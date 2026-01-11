@@ -19,7 +19,7 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
     return `
       <div id="section-${section.id}" class="section-content ${index === 0 ? '' : 'hidden'}">
         <header class="mb-8 pb-4">
-           <h1 class="text-3xl md:text-5xl font-extrabold text-slate-100 tracking-tight leading-tight mb-6">${escapeHtml(section.title)}</h1>
+           <h1 class="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-tight leading-tight mb-6">${escapeHtml(section.title)}</h1>
            <!-- Option A: Aurora Gradient (Full Width, Thinner 1.5px) -->
            <div class="h-[1.5px] w-full rounded-full bg-gradient-to-r from-[#5ABDAC] to-transparent"></div>
         </header>
@@ -121,21 +121,21 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
       
       /* Specific Styling Overrides for Export */
       
-      /* Headings */
+      /* Headings - Scaled Down for Neatness */
       .prose h2 { 
           color: #5ABDAC !important; 
-          font-size: 1.5em !important; 
+          font-size: 1.35em !important; 
           margin-top: 1.2em !important; 
           margin-bottom: 0.5em !important; 
       }
       .prose h3 { 
           color: #4A9E92 !important; 
-          font-size: 1.25em !important; 
+          font-size: 1.15em !important; 
           margin-top: 1.0em !important; 
           margin-bottom: 0.4em !important; 
       }
       .prose h4 {
-          font-size: 1.1em !important;
+          font-size: 1.0em !important;
           margin-top: 1.0em !important;
           margin-bottom: 0.4em !important;
       }
@@ -165,11 +165,12 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
           color: #5ABDAC !important;
       }
 
-      /* Body Text & Spacing - Tightened */
+      /* Body Text & Spacing - Tightened & Smaller Base */
       .prose p { 
           margin-bottom: 0.6em !important; 
           margin-top: 0.6em !important; 
-          line-height: 1.6 !important; 
+          line-height: 1.7 !important; 
+          font-size: 0.95em !important;
       }
       
       /* List Styling */
@@ -179,6 +180,7 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
           margin-left: 0.5rem !important;
           padding-left: 1.5rem !important;
           border-left: none !important; /* Ensure no border on top level */
+          font-size: 0.95em !important;
       }
       
       /* Nested List Styling - Guide Lines */
@@ -193,7 +195,7 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
       .prose li { 
           margin-top: 0.2em !important; 
           margin-bottom: 0.2em !important; 
-          line-height: 1.5 !important;
+          line-height: 1.6 !important;
           padding-left: 0.5rem !important;
       }
 
@@ -206,7 +208,7 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
           overflow: hidden;
           margin-bottom: 2em; 
           border: 1px solid #334155;
-          font-size: 0.95em;
+          font-size: 0.9em;
       }
       .prose thead th { 
           background-color: #1e293b; 
@@ -221,7 +223,7 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
           border-bottom: 1px solid #1e293b; 
           vertical-align: top;
           white-space: pre-wrap;
-          line-height: 1.75rem;
+          line-height: 1.6rem;
       }
       
       /* Fix for BR spacing in tables to simulate paragraphs */
