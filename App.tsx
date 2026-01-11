@@ -102,7 +102,7 @@ const App: React.FC = () => {
         <div className="max-w-md w-full text-center space-y-10">
           <div className="space-y-4">
             <h1 className="text-5xl font-extrabold text-white tracking-tight">DocuFlow</h1>
-            <p className="text-slate-400 text-xl font-light">Transform Markdown into elegant, dark-themed documentation.</p>
+            <p className="text-slate-400 text-xl font-light">Transform Markdown into dark-themed HTML</p>
           </div>
           
           <div className="bg-[#0f172a] p-12 rounded-3xl shadow-2xl border border-slate-800 transition-all hover:border-[#5ABDAC]/50 hover:shadow-[#5ABDAC]/20 group">
@@ -111,7 +111,7 @@ const App: React.FC = () => {
                 <UploadCloud size={40} />
               </div>
               <span className="text-xl font-semibold text-slate-200 group-hover:text-[#5ABDAC] transition-colors">Select Markdown File</span>
-              <span className="text-sm text-slate-500 mt-3 font-medium">Supports .md files</span>
+              <span className="text-sm text-slate-500 mt-3 font-medium">".md" files only</span>
               <input 
                 type="file" 
                 accept=".md,.markdown,.txt" 
@@ -122,7 +122,7 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex gap-6 justify-center text-xs text-slate-500 font-medium tracking-wide uppercase">
-             <span>Dark Mode</span> &bull; <span>Split View</span> &bull; <span>Offline Export</span>
+             <span>Dark Mode</span> &bull; <span>Sidebar TOC</span>
           </div>
         </div>
       </div>
