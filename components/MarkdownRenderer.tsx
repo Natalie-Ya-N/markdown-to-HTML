@@ -2,10 +2,51 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
+import { visit } from 'unist-util-visit';
+import { Info, AlertTriangle, AlertCircle, Flame, Lightbulb } from 'lucide-react';
 
 interface MarkdownRendererProps {
   content: string;
 }
+
+// Remark plugin to detect [!NOTE], [!TIP], etc. in blockquotes
+const remarkAlerts = () => {
+  return (tree: any) => {
+    visit(tree, 'blockquote', (node: any) => {
+      if (!node.children || node.children.length === 0) return;
+      const firstChild = node.children[0];
+      // We look for a paragraph as the first child
+      if (firstChild.type !== 'paragraph' || !firstChild.children || firstChild.children.length === 0) return;
+      
+      const firstTextNode = firstChild.children[0];
+      if (firstTextNode.type !== 'text') return;
+      
+      const content = firstTextNode.value;
+      const alertMatch = content.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
+      
+      if (alertMatch) {
+        const alertType = alertMatch[1].toUpperCase();
+        // Add data attribute to the blockquote node properties
+        node.data = node.data || {};
+        node.data.hProperties = node.data.hProperties || {};
+        node.data.hProperties['data-alert-type'] = alertType;
+        
+        // Remove the [!TYPE] text from the node content
+        // This ensures the rendered text doesn't show the raw tag
+        const newText = content.replace(alertMatch[0], '').trimStart();
+        
+        // Update the text node value
+        if (!newText && firstChild.children.length === 1) {
+             // If the text node was the only child and is now empty, we empty it
+             // React Markdown handles empty text nodes fine
+             firstTextNode.value = '';
+        } else {
+             firstTextNode.value = newText;
+        }
+      }
+    });
+  };
+};
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
   return (
@@ -20,42 +61,95 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         /* Nested lists get the guide line */
         .markdown-body li > ul, .markdown-body li > ol {
           border-left: 1px solid #334155;
-          padding-left: 3rem; /* Increased indentation to 3rem */
-          margin-left: -1.25rem; /* Align with parent bullet */
+          padding-left: 3rem;
+          margin-left: -1.25rem;
           margin-top: 0.5rem;
           margin-bottom: 0.5rem;
         }
 
-        /* Table cell spacing: Distinguish explicit newlines from wrapped lines */
-        /* Using !important to ensure this overrides any browser or parent styles */
+        /* Table cell spacing */
         .markdown-body td br {
           display: block;
-          margin-top: 3rem !important; /* Significantly increased spacing for explicit breaks */
-          content: " " !important; /* Ensure content exists for block rendering */
+          margin-top: 3rem !important;
+          content: " " !important;
           line-height: 0;
         }
       `}</style>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkAlerts]}
         rehypePlugins={[rehypeHighlight]}
         components={{
-          h1: ({node, ...props}) => <h1 className="hidden" {...props} />, // H1 is handled by the page header
-          // Reduced H2 from text-2xl to text-xl
+          h1: ({node, ...props}) => <h1 className="hidden" {...props} />, 
           h2: ({node, ...props}) => <h2 className="text-xl md:text-2xl font-bold text-[#5ABDAC] mt-10 mb-5 pb-2 tracking-tight" {...props} />,
-          // Reduced H3 from text-xl to text-lg
           h3: ({node, ...props}) => <h3 className="text-lg md:text-xl font-semibold text-[#4A9E92] mt-8 mb-3" {...props} />,
           h4: ({node, ...props}) => <h4 className="text-base md:text-lg font-semibold text-slate-300 mt-6 mb-2" {...props} />,
-          // Reduced P from text-lg to text-base (16px) for a neater look
           p: ({node, ...props}) => <p className="text-base leading-7 text-slate-300 mb-5" {...props} />,
           strong: ({node, ...props}) => <strong className="font-bold text-[#5ABDAC]" {...props} />,
           b: ({node, ...props}) => <b className="font-bold text-[#5ABDAC]" {...props} />,
-          // Reduced list text from text-lg to text-base
           ul: ({node, ...props}) => <ul className="list-disc list-outside mb-5 text-slate-300 space-y-1.5 text-base marker:text-slate-500" {...props} />,
           ol: ({node, ...props}) => <ol className="list-decimal list-outside mb-5 text-slate-300 space-y-1.5 text-base marker:text-slate-500" {...props} />,
           li: ({node, ...props}) => <li className="pl-2 leading-7" {...props} />,
-          blockquote: ({node, ...props}) => (
-            <blockquote className="border-l-4 border-[#5ABDAC] bg-slate-800/50 pl-5 py-3 my-6 rounded-r italic text-slate-400 text-sm shadow-sm" {...props} />
-          ),
+          
+          // Enhanced Blockquote / Callout Handler
+          blockquote: ({node, className, children, ...props}) => {
+            const alertType = props['data-alert-type'] as string | undefined;
+
+            if (alertType) {
+              let styles = "border-l-4 rounded-r p-4 my-6 text-sm ";
+              let title = alertType;
+              let Icon = Info;
+              
+              switch (alertType) {
+                case 'NOTE':
+                  styles += "border-blue-500 bg-blue-500/10 text-blue-200";
+                  Icon = Info;
+                  title = "Note";
+                  break;
+                case 'TIP':
+                  styles += "border-green-500 bg-green-500/10 text-green-200";
+                  Icon = Lightbulb;
+                  title = "Tip";
+                  break;
+                case 'IMPORTANT':
+                  styles += "border-purple-500 bg-purple-500/10 text-purple-200";
+                  Icon = AlertCircle;
+                  title = "Important";
+                  break;
+                case 'WARNING':
+                  styles += "border-amber-500 bg-amber-500/10 text-amber-200";
+                  Icon = AlertTriangle;
+                  title = "Warning";
+                  break;
+                case 'CAUTION':
+                  styles += "border-red-500 bg-red-500/10 text-red-200";
+                  Icon = Flame;
+                  title = "Caution";
+                  break;
+                default:
+                  styles += "border-slate-500 bg-slate-800/50 text-slate-300";
+              }
+
+              return (
+                <div className={styles} {...props}>
+                  <div className="flex items-center gap-2 mb-2 font-bold opacity-90">
+                    <Icon size={18} />
+                    <span>{title}</span>
+                  </div>
+                  <div className="opacity-90 [&>p]:mb-0 [&>p:first-child]:mt-0">
+                    {children}
+                  </div>
+                </div>
+              );
+            }
+
+            // Default blockquote
+            return (
+              <blockquote className="border-l-2 border-[#5ABDAC] bg-slate-800/50 pl-5 py-3 my-6 rounded-r text-slate-400 text-sm shadow-sm italic" {...props}>
+                {children}
+              </blockquote>
+            );
+          },
+          
           a: ({node, ...props}) => <a className="text-[#5ABDAC] hover:text-[#7CD4C6] underline transition-colors decoration-[#5ABDAC]/30 underline-offset-4" target="_blank" rel="noopener noreferrer" {...props} />,
           code: ({node, className, children, ...props}) => {
              const match = /language-(\w+)/.exec(className || '')

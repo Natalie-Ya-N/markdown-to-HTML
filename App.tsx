@@ -81,12 +81,25 @@ const App: React.FC = () => {
 
   const handleDownload = () => {
     if (!doc) return;
+    
+    // Generate Timestamp: YYMMDD-HHMM
+    const now = new Date();
+    const year = String(now.getFullYear()).slice(-2);
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const timestamp = `${year}${month}${day}-${hours}${minutes}`;
+
+    const baseFileName = doc.fileName.replace(/\.[^/.]+$/, '');
+    const exportFileName = `${baseFileName}-${timestamp}-sectioned.html`;
+
     const htmlContent = generateStandaloneHtml(doc);
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${doc.fileName.replace(/\.[^/.]+$/, '')}-export.html`;
+    a.download = exportFileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

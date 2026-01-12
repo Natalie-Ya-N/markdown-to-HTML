@@ -66,7 +66,6 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
   }).join('');
 
   // Define styling constants for consistency between initial render and JS updates
-  // Updated colors to match Cyan theme
   const btnBaseClass = "w-full text-left px-2 py-1.5 rounded-md text-sm transition-all duration-200 group flex items-center justify-between";
   const btnActiveExtra = "bg-[#5ABDAC]/10 text-[#5ABDAC] font-medium ring-1 ring-[#5ABDAC]/30";
   const btnInactiveExtra = "text-slate-400 hover:bg-slate-800 hover:text-slate-200";
@@ -83,7 +82,6 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
     </li>
   `).join('');
 
-  // Remove file extension for display
   const displayFileName = doc.fileName.replace(/\.[^/.]+$/, "");
 
   return `<!DOCTYPE html>
@@ -121,7 +119,7 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
       
       /* Specific Styling Overrides for Export */
       
-      /* Headings - Scaled Down for Neatness */
+      /* Headings */
       .prose h2 { 
           color: #5ABDAC !important; 
           font-size: 1.35em !important; 
@@ -155,17 +153,51 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
           color: #7CD4C6 !important;
       }
       
-      /* Blockquotes */
+      /* Blockquotes - FIX: Remove default quotes and style border */
       .prose blockquote {
           border-left-color: #5ABDAC !important;
+          border-left-width: 2px !important;
+          font-style: normal !important;
+          quotes: none !important;
+          color: #94a3b8 !important;
       }
+      .prose blockquote p:first-of-type::before { content: none !important; }
+      .prose blockquote p:last-of-type::after { content: none !important; }
+
+      /* Callout Styles for Exported HTML */
+      .callout {
+        border-left-width: 4px !important;
+        border-radius: 0 0.25rem 0.25rem 0;
+        padding: 1rem !important;
+        margin-top: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+        font-size: 0.875rem !important;
+        background-color: rgba(30, 41, 59, 0.5); /* Default fallback */
+      }
+      .callout-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-transform: capitalize;
+        opacity: 0.9;
+      }
+      
+      .callout-note { border-color: #3b82f6 !important; background-color: rgba(59, 130, 246, 0.1) !important; color: #bfdbfe !important; }
+      .callout-tip { border-color: #22c55e !important; background-color: rgba(34, 197, 94, 0.1) !important; color: #bbf7d0 !important; }
+      .callout-important { border-color: #a855f7 !important; background-color: rgba(168, 85, 247, 0.1) !important; color: #e9d5ff !important; }
+      .callout-warning { border-color: #f59e0b !important; background-color: rgba(245, 158, 11, 0.1) !important; color: #fde68a !important; }
+      .callout-caution { border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.1) !important; color: #fecaca !important; }
 
       /* Inline Code */
       .prose code {
           color: #5ABDAC !important;
       }
+      .prose code::before { content: none !important; }
+      .prose code::after { content: none !important; }
 
-      /* Body Text & Spacing - Tightened & Smaller Base */
+      /* Body Text & Spacing */
       .prose p { 
           margin-bottom: 0.6em !important; 
           margin-top: 0.6em !important; 
@@ -179,17 +211,17 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
           margin-top: 0.4em !important;
           margin-left: 0.5rem !important;
           padding-left: 1.5rem !important;
-          border-left: none !important; /* Ensure no border on top level */
+          border-left: none !important;
           font-size: 0.95em !important;
       }
       
-      /* Nested List Styling - Guide Lines */
+      /* Nested List Styling */
       .prose li > ul, .prose li > ol { 
           margin-top: 0.5em !important;
           margin-bottom: 0.5em !important;
-          border-left: 1px solid #334155 !important; /* Thin line */
-          padding-left: 3rem !important; /* Increased indentation to 3rem */
-          margin-left: -1.25rem !important; /* Align with parent bullet */
+          border-left: 1px solid #334155 !important;
+          padding-left: 3rem !important;
+          margin-left: -1.25rem !important;
       }
 
       .prose li { 
@@ -199,7 +231,7 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
           padding-left: 0.5rem !important;
       }
 
-      /* Beautified Table Styling */
+      /* Table Styling */
       .prose table { 
           width: 100%; 
           text-align: left; 
@@ -225,8 +257,6 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
           white-space: pre-wrap;
           line-height: 1.6rem;
       }
-      
-      /* Fix for BR spacing in tables to simulate paragraphs */
       .prose tbody td br {
           display: block;
           content: " " !important;
@@ -234,17 +264,11 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
           margin-bottom: 0 !important;
           line-height: 0 !important;
       }
-      .prose tbody tr:last-child td { 
-          border-bottom: none; 
-      }
-      .prose tbody tr:nth-child(even) { 
-          background-color: #0f172a; 
-      }
-      .prose tbody tr:nth-child(odd) { 
-          background-color: rgba(30, 41, 59, 0.4); 
-      }
+      .prose tbody tr:last-child td { border-bottom: none; }
+      .prose tbody tr:nth-child(even) { background-color: #0f172a; }
+      .prose tbody tr:nth-child(odd) { background-color: rgba(30, 41, 59, 0.4); }
 
-      /* Resize Handle for export */
+      /* Resize Handle */
       .resizer { 
         width: 1px; 
         background: #1e293b; 
@@ -253,10 +277,7 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
         flex-shrink: 0;
         z-index: 10;
       }
-      .resizer:hover, .resizer.resizing { 
-        background: #5ABDAC; 
-        width: 3px;
-      }
+      .resizer:hover, .resizer.resizing { background: #5ABDAC; width: 3px; }
 
       @media (max-width: 768px) {
         .layout-container { flex-direction: column; }
@@ -292,15 +313,54 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
     </div>
 
     <script>
-        // Initialize Markdown parsing
         document.addEventListener('DOMContentLoaded', () => {
             marked.use({ breaks: true, gfm: true });
+            
+            // Process Callouts/Alerts and render Markdown
             const rawDivs = document.querySelectorAll('.markdown-raw');
             rawDivs.forEach(div => {
-                const raw = div.textContent; // Use textContent to preserve newlines from hidden divs
-                const rendered = marked.parse(raw);
+                const raw = div.textContent; 
+                let rendered = marked.parse(raw);
                 div.nextElementSibling.innerHTML = rendered;
             });
+
+            // Post-processing for Callouts styling
+            // This script converts blockquotes that start with [!NOTE] etc. into styled divs
+            document.querySelectorAll('.markdown-rendered blockquote').forEach(bq => {
+                const firstP = bq.querySelector('p');
+                if (!firstP) return;
+                
+                const text = firstP.textContent.trim();
+                // Check for GitHub Alert syntax
+                const match = text.match(/^\\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\\]/i);
+                
+                if (match) {
+                    const type = match[1].toLowerCase();
+                    const titleText = type.charAt(0).toUpperCase() + type.slice(1);
+                    
+                    // Add classes
+                    bq.classList.add('callout', 'callout-' + type);
+                    
+                    // Clean up text content in the paragraph to remove the tag
+                    const newText = firstP.innerHTML.replace(/^\\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\\]/i, '').trim();
+                    firstP.innerHTML = newText;
+
+                    // Insert Title
+                    const titleDiv = document.createElement('div');
+                    titleDiv.className = 'callout-title';
+                    // Simple icons using SVG
+                    let iconSvg = '';
+                    if (type === 'note') iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+                    if (type === 'tip') iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a6 6 0 0 0-6 6c0 1.9 1 3.7 2.5 5 1.5 1.3 2.5 3 2.5 5h2c0-2 1-3.7 2.5-5C14 11.7 15 9.9 15 8a6 6 0 0 0-6-6z"></path><path d="M9 22h6"></path></svg>';
+                    if (type === 'important') iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+                    if (type === 'warning') iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+                    if (type === 'caution') iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.1.2-2.2.5-3.3"></path></svg>';
+                    
+                    titleDiv.innerHTML = iconSvg + '<span>' + titleText + '</span>';
+                    bq.insertBefore(titleDiv, firstP);
+                }
+            });
+
             hljs.highlightAll();
 
             // Resizing Logic
@@ -337,32 +397,20 @@ export const generateStandaloneHtml = (doc: ParsedDoc): string => {
         });
 
         function switchSection(id) {
-            // Hide all sections
             document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
-            // Show target
             document.getElementById('section-' + id).classList.remove('hidden');
-            
-            // Scroll main content to top
             const mainContent = document.querySelector('.main-content');
-            if (mainContent) {
-                mainContent.scrollTop = 0;
-            }
+            if (mainContent) mainContent.scrollTop = 0;
 
-            // Re-apply classes using the exact same strings as the generator
             const baseClass = "${btnBaseClass}";
             const activeClass = "${btnActiveExtra}";
             const inactiveClass = "${btnInactiveExtra}";
 
-            // Reset all buttons
             document.querySelectorAll('button[id^="btn-"]').forEach(btn => {
                 btn.className = baseClass + " " + inactiveClass;
             });
-            
-            // Highlight active button
             const activeBtn = document.getElementById('btn-' + id);
-            if (activeBtn) {
-                activeBtn.className = baseClass + " " + activeClass;
-            }
+            if (activeBtn) activeBtn.className = baseClass + " " + activeClass;
         }
     </script>
 </body>
